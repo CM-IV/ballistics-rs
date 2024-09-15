@@ -1,11 +1,7 @@
 use bon::bon;
 
 use crate::{
-    constants::{GyroscopicStability, KineticEnergy, SpeedOfSound},
-    AerodynamicJump, ApertureSightCalibration, BallisticCoefficient, BulletDiameter, BulletLength,
-    BulletMass, Distance, DragCoefficient, FormFactor, LagTime, Pressure, RiflingTwist,
-    SightCalibration, Temperature, TimeOfFlight, Velocity, VelocityProjection, WindDeflection,
-    WindSpeed,
+    constants::{GyroscopicStability, KineticEnergy, SpeedOfSound}, AerodynamicJump, ApertureSightCalibration, BallisticCoefficient, BulletDiameter, BulletLength, BulletMass, Distance, DragCoefficient, FormFactor, LagTime, Pressure, RiflingTwist, SightCalibration, SpinDrift, Temperature, TimeOfFlight, Velocity, VelocityProjection, WindDeflection, WindSpeed
 };
 
 #[bon]
@@ -235,6 +231,26 @@ impl GyroscopicStability {
         GyroscopicStability(
             (gyro_stability.0) * ((air_temp.0 + 460.0) / (59.0 + 460.0) * (29.92 / air_pressure.0)),
         )
+    }
+}
+
+#[bon]
+impl SpinDrift {
+    /// Calculates the spin drift of a bullet.
+    ///
+    /// Spin drift is the lateral deviation of a bullet's trajectory due to the gyroscopic effects
+    /// of the bullet's spin. This function calculates the spin drift based on the gyroscopic stability
+    /// factor and the actual time of flight.
+    ///
+    /// # Parameters
+    /// - `gyro_stability`: The gyroscopic stability factor of the bullet.
+    /// - `actual_time_of_flight`: The actual time of flight of the bullet.
+    ///
+    /// # Returns
+    /// A `SpinDrift` instance representing the calculated spin drift of the bullet.
+    #[builder(finish_fn = solve)]
+    pub fn calculate(gyro_stability: GyroscopicStability, actual_time_of_flight: TimeOfFlight) -> Self {
+        SpinDrift(1.25 * (gyro_stability.0 + 1.2) * actual_time_of_flight.0.powf(1.83))
     }
 }
 

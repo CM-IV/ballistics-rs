@@ -31,6 +31,12 @@ pub struct Distance(pub f64);
 #[derive(Synonym)]
 pub struct WindSpeed(pub f64);
 
+/// Spin Drift (in)
+///
+/// This struct represents the spin drift in inches in the direction of rifling twist.
+#[derive(Synonym)]
+pub struct SpinDrift(pub f64);
+
 /// Drag Coefficient
 ///
 /// This struct represents the drag coefficient of a bullet at some speed.

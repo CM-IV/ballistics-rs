@@ -4,7 +4,7 @@ bon = "2.3.0"
 
 [package]
 name = "ballistics_rs"
-version = "0.1.3"
+version = "0.1.4"
 authors = ["CM-IV"]
 edition = "2021"
 license = "MIT"
