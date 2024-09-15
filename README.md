@@ -166,6 +166,21 @@ let atmospheric_corrected = GyroscopicStability::atmospheric_correction()
 println!("Gyroscopic stability factor: {}", atmospheric_corrected.0);
 ```
 
+### Spin Drift
+
+Calculate the spin drift of a bullet in the direction of rifling twist:
+
+```rust
+use ballistics_rs::{GyroscopicStability, TimeOfFlight, SpinDrift};
+
+let spin_drift = SpinDrift::calculate()
+    .gyro_stability(GyroscopicStability(1.5))
+    .actual_time_of_flight(TimeOfFlight(1.2))
+    .solve();
+
+println!("Spin drift: {}", spin_drift.0);
+```
+
 ### Ballistic Coefficient
 
 Calculate the ballistic coefficient of a bullet:
