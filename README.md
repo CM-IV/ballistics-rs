@@ -26,7 +26,7 @@ use ballistics_rs::{SpeedOfSound, Temperature};
 
 let speed = SpeedOfSound::calculate()
     .temperature(Temperature(68.0))
-    .call();
+    .solve();
 
 println!("Speed of sound: {} ft/s", speed.0);
 ```
@@ -36,12 +36,12 @@ println!("Speed of sound: {} ft/s", speed.0);
 Calculate the kinetic energy of a bullet:
 
 ```rust
-use ballistics_rs::{KineticEnergy, BulletMass};
+use ballistics_rs::{KineticEnergy, BulletMass, Velocity};
 
 let energy = KineticEnergy::calculate()
     .bullet_weight(BulletMass(150.0))
-    .velocity(3000.0)
-    .call();
+    .velocity(Velocity(3000.0))
+    .solve();
 
 println!("Kinetic energy: {} ft-lbs", energy.0);
 ```
@@ -51,12 +51,12 @@ println!("Kinetic energy: {} ft-lbs", energy.0);
 Determine the movement of your point of aim for each click of an aperture:
 
 ```rust
-use ballistics_rs::ApertureSightCalibration;
+use ballistics_rs::{ApertureSightCalibration, SightCalibration};
 
 let calibration = ApertureSightCalibration::calculate()
-    .sight_movement_twenty_clicks(0.1)
-    .sight_radius(28.0)
-    .call();
+    .sight_movement_twenty_clicks(SightCalibration(0.1))
+    .sight_radius(SightCalibration(28.0))
+    .solve();
 
 println!("MOA per click: {}", calibration.0);
 ```
@@ -66,12 +66,12 @@ println!("MOA per click: {}", calibration.0);
 Calculate the form factor of a bullet:
 
 ```rust
-use ballistics_rs::FormFactor;
+use ballistics_rs::{FormFactor, DragCoefficient};
 
 let form_factor = FormFactor::calculate()
-    .drag_coefficient(0.223)
-    .standard_bullet_drag_coefficient(0.2)
-    .call();
+    .drag_coefficient(DragCoefficient(0.223))
+    .standard_bullet_drag_coefficient(DragCoefficient(0.2))
+    .solve();
 
 println!("Form factor: {}", form_factor.0);
 ```
@@ -81,13 +81,13 @@ println!("Form factor: {}", form_factor.0);
 Project the velocity of a second bullet based on the weight and velocity of a first bullet:
 
 ```rust
-use ballistics_rs::{VelocityProjection, BulletMass};
+use ballistics_rs::{VelocityProjection, BulletMass, Velocity};
 
 let projected_velocity = VelocityProjection::calculate()
     .bullet_weight_1(BulletMass(150.0))
     .bullet_weight_2(BulletMass(180.0))
-    .bullet_velocity_1(3000.0)
-    .call();
+    .bullet_velocity_1(Velocity(3000.0))
+    .solve();
 
 println!("Projected velocity of second bullet: {} ft/s", projected_velocity.0);
 ```
@@ -97,13 +97,13 @@ println!("Projected velocity of second bullet: {} ft/s", projected_velocity.0);
 Calculate the lag time of a bullet:
 
 ```rust
-use ballistics_rs::{LagTime, MuzzleVelocity};
+use ballistics_rs::{LagTime, TimeOfFlight, Distance, Velocity};
 
 let lag_time = LagTime::calculate()
-    .actual_time_of_flight(1.2)
-    .distance(1000.0)
-    .muzzle_velocity(MuzzleVelocity(3000.0))
-    .call();
+    .actual_time_of_flight(TimeOfFlight(1.2))
+    .distance(Distance(1000.0))
+    .muzzle_velocity(Velocity(3000.0))
+    .solve();
 
 println!("Lag time: {} seconds", lag_time.0);
 ```
@@ -113,12 +113,12 @@ println!("Lag time: {} seconds", lag_time.0);
 Calculate the wind deflection of a bullet:
 
 ```rust
-use ballistics_rs::{WindDeflection, LagTime};
+use ballistics_rs::{WindDeflection, LagTime, WindSpeed};
 
 let wind_deflection = WindDeflection::calculate()
     .lag_time(LagTime(0.1))
-    .crosswind_speed(10.0)
-    .call();
+    .crosswind_speed(WindSpeed(10.0))
+    .solve();
 
 println!("Wind deflection: {} inches", wind_deflection.0);
 ```
@@ -128,12 +128,12 @@ println!("Wind deflection: {} inches", wind_deflection.0);
 Calculate the aerodynamic jump of a bullet:
 
 ```rust
-use ballistics_rs::{AerodynamicJump, GyroscopicStability};
+use ballistics_rs::{AerodynamicJump, GyroscopicStability, BulletLength};
 
 let jump = AerodynamicJump::calculate()
     .gyro_stability(GyroscopicStability(1.5))
-    .bullet_length(4.0)
-    .call();
+    .bullet_length(BulletLength(4.0))
+    .solve();
 
 println!("Aerodynamic jump: {} MOA", jump.0);
 ```
@@ -143,25 +143,25 @@ println!("Aerodynamic jump: {} MOA", jump.0);
 Calculate the gyroscopic stability factor of a bullet:
 
 ```rust
-use ballistics_rs::{GyroscopicStability, BulletMass, MuzzleVelocity, Temperature, Pressure};
+use ballistics_rs::{GyroscopicStability, BulletMass, RiflingTwist, BulletDiameter, BulletLength, Velocity, Temperature, Pressure};
 
 let stability = GyroscopicStability::calculate()
     .bullet_mass(BulletMass(150.0))
-    .rifling_twist(10.0)
-    .bullet_diameter(0.308)
-    .bullet_length(4.0)
-    .call();
+    .rifling_twist(RiflingTwist(10.0))
+    .bullet_diameter(BulletDiameter(0.308))
+    .bullet_length(BulletLength(4.0))
+    .solve();
 
 let velocity_corrected = GyroscopicStability::velocity_correction()
-    .muzzle_velocity(MuzzleVelocity(3000.0))
+    .muzzle_velocity(Velocity(3000.0))
     .gyro_stability(stability)
-    .call();
+    .solve();
 
 let atmospheric_corrected = GyroscopicStability::atmospheric_correction()
     .air_temp(Temperature(68.0))
     .air_pressure(Pressure(29.92))
     .gyro_stability(velocity_corrected)
-    .call();
+    .solve();
 
 println!("Gyroscopic stability factor: {}", atmospheric_corrected.0);
 ```
@@ -171,13 +171,13 @@ println!("Gyroscopic stability factor: {}", atmospheric_corrected.0);
 Calculate the ballistic coefficient of a bullet:
 
 ```rust
-use ballistics_rs::{BallisticCoefficient, BulletMass, FormFactor};
+use ballistics_rs::{BallisticCoefficient, BulletMass, BulletDiameter, FormFactor};
 
 let bc = BallisticCoefficient::calculate()
     .bullet_mass(BulletMass(150.0))
-    .bullet_diameter(0.308)
+    .bullet_diameter(BulletDiameter(0.308))
     .form_factor(FormFactor(1.0))
-    .call();
+    .solve();
 
 println!("Ballistic coefficient: {}", bc.0);
 ```
@@ -186,42 +186,12 @@ println!("Ballistic coefficient: {}", bc.0);
 
 The crate also provides several constants for use in calculations:
 
-- `STANDARD_GRAVITY`: Standard gravitational constant (32.174 ft/s²).
-
 ```rust
-use ballistics_rs::constants::STANDARD_GRAVITY;
+use ballistics_rs::constants::{STANDARD_GRAVITY, SPEED_OF_SOUND_SEA_LEVEL, AIR_DENSITY_SEA_LEVEL, STANDARD_PRESSURE, STANDARD_TEMPERATURE};
 
+println!("Speed of Sound at Sea Level: {} ft/s", SPEED_OF_SOUND_SEA_LEVEL.0);
+println!("Air Density at Sea Level: {} lb/ft³", AIR_DENSITY_SEA_LEVEL.0);
 println!("Standard Gravity: {} ft/s²", STANDARD_GRAVITY.0);
-```
-
-- `SPEED_OF_SOUND_SEA_LEVEL`: Speed of sound at sea level (1116.28 ft/s).
-
-```rust
-use ballistics_rs::constants::SPEED_OF_SOUND_SEA_LEVEL;
-
-println!("Speed of Sound: {} ft/s", SPEED_OF_SOUND_SEA_LEVEL.0);
-```
-
-- `AIR_DENSITY_SEA_LEVEL`: Air density at sea level (0.0765 lb/ft³).
-
-```rust
-use ballistics_rs::constants::AIR_DENSITY_SEA_LEVEL;
-
-println!("Air Density: {} lb/ft³", AIR_DENSITY_SEA_LEVEL.0);
-```
-
-- `STANDARD_PRESSURE`: ICAO standard air pressure (29.92 inHg).
-
-```rust
-use ballistics_rs::constants::STANDARD_PRESSURE;
-
 println!("Standard Pressure: {} inHg", STANDARD_PRESSURE.0);
-```
-
-- `STANDARD_TEMPERATURE`: ICAO standard temperature (59.0 F).
-
-```rust
-use ballistics_rs::constants::STANDARD_TEMPERATURE;
-
 println!("Standard Temperature: {} F", STANDARD_TEMPERATURE.0);
 ```

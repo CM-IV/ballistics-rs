@@ -1,6 +1,6 @@
 [dependencies]
 synonym = "0.1.5"
-bon = "2.1.1"
+bon = "2.3.0"
 
 [package]
 name = "ballistics_rs"

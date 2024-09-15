@@ -17,7 +17,7 @@ impl SpeedOfSound {
     ///
     /// # Returns
     /// A `SpeedOfSound` instance representing the speed of sound at the given temperature.
-    #[builder]
+    #[builder(finish_fn = solve)]
     pub fn calculate(temperature: Temperature) -> Self {
         SpeedOfSound(49.0223 * (temperature.0 + 459.67).sqrt())
     }
@@ -33,7 +33,7 @@ impl KineticEnergy {
     ///
     /// # Returns
     /// A `KineticEnergy` instance representing the kinetic energy of the bullet.
-    #[builder]
+    #[builder(finish_fn = solve)]
     pub fn calculate(bullet_weight: BulletMass, velocity: Velocity) -> Self {
         KineticEnergy((bullet_weight.0 * velocity.0.powi(2)) / 450800.0)
     }
@@ -50,7 +50,7 @@ impl ApertureSightCalibration {
     ///
     /// # Returns
     /// A `ApertureSightCalibration` instance representing MOA per click.
-    #[builder]
+    #[builder(finish_fn = solve)]
     pub fn calculate(
         sight_movement_twenty_clicks: SightCalibration,
         sight_radius: SightCalibration,
@@ -69,7 +69,7 @@ impl FormFactor {
     ///
     /// # Returns
     /// A `FormFactor` instance representing a unitless form factor.
-    #[builder]
+    #[builder(finish_fn = solve)]
     pub fn calculate(
         drag_coefficient: DragCoefficient,
         standard_bullet_drag_coefficient: DragCoefficient,
@@ -92,7 +92,7 @@ impl VelocityProjection {
     ///
     /// # Returns
     /// A `VelocityProjection` instance representing the projected velocity of the second bullet in ft/s.
-    #[builder]
+    #[builder(finish_fn = solve)]
     pub fn calculate(
         bullet_weight_1: BulletMass,
         bullet_weight_2: BulletMass,
@@ -116,7 +116,7 @@ impl LagTime {
     ///
     /// # Returns
     /// A `LagTime` instance representing the lag time in seconds.
-    #[builder]
+    #[builder(finish_fn = solve)]
     pub fn calculate(
         actual_time_of_flight: TimeOfFlight,
         distance: Distance,
@@ -143,7 +143,7 @@ impl WindDeflection {
     ///
     /// # Returns
     /// A `WindDeflection` instance representing the wind deflection in inches.
-    #[builder]
+    #[builder(finish_fn = solve)]
     pub fn calculate(lag_time: LagTime, crosswind_speed: WindSpeed) -> Self {
         WindDeflection(17.6 * crosswind_speed.0 * lag_time.0)
     }
@@ -163,7 +163,7 @@ impl AerodynamicJump {
     ///
     /// # Returns
     /// Returns an `AerodynamicJump` instance containing the calculated value.
-    #[builder]
+    #[builder(finish_fn = solve)]
     pub fn calculate(gyro_stability: GyroscopicStability, bullet_length: BulletLength) -> Self {
         AerodynamicJump(0.01 * gyro_stability.0 - 0.0024 * bullet_length.0 + 0.032)
     }
@@ -181,7 +181,7 @@ impl GyroscopicStability {
     ///
     /// # Returns
     /// A `GyroscopicStability` instance representing the gyroscopic stability factor of the bullet at 2800 ft/s.
-    #[builder]
+    #[builder(finish_fn = solve)]
     pub fn calculate(
         bullet_mass: BulletMass,
         rifling_twist: RiflingTwist,
@@ -207,7 +207,7 @@ impl GyroscopicStability {
     ///
     /// # Returns
     /// A `GyroscopicStability` instance representing the corrected gyroscopic stability factor of the bullet.
-    #[builder]
+    #[builder(finish_fn = solve)]
     pub fn velocity_correction(
         muzzle_velocity: Velocity,
         gyro_stability: GyroscopicStability,
@@ -226,7 +226,7 @@ impl GyroscopicStability {
     ///
     /// # Returns
     /// A `GyroscopicStability` instance representing the corrected gyroscopic stability factor of the bullet.
-    #[builder]
+    #[builder(finish_fn = solve)]
     pub fn atmospheric_correction(
         air_temp: Temperature,
         air_pressure: Pressure,
@@ -252,7 +252,7 @@ impl BallisticCoefficient {
     ///
     /// # Returns
     /// A `BallisticCoefficient` instance representing the ballistic coefficient of the bullet.
-    #[builder]
+    #[builder(finish_fn = solve)]
     pub fn calculate(
         bullet_mass: BulletMass,
         bullet_diameter: BulletDiameter,
