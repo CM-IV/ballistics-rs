@@ -12,7 +12,7 @@ To use `ballistics_rs` in your project, add the following to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-ballistics_rs = "0.1.3"
+ballistics_rs = "0.1.4"
 ```
 
 ## Usage
