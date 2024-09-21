@@ -111,11 +111,11 @@ pub struct FormFactor(pub f64);
 #[derive(Synonym)]
 pub struct AerodynamicJump(pub f64);
 
-/// Bullet mass (grains)
+/// Bullet weight (grains)
 ///
-/// This struct represents the mass of the bullet in grains.
+/// This struct represents the weight of the bullet in grains.
 #[derive(Synonym)]
-pub struct BulletMass(pub f64);
+pub struct BulletWeight(pub f64);
 
 /// Temperature (F)
 ///

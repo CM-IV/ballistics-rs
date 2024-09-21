@@ -1,7 +1,11 @@
 use bon::bon;
 
 use crate::{
-    constants::{GyroscopicStability, KineticEnergy, SpeedOfSound}, AerodynamicJump, ApertureSightCalibration, BallisticCoefficient, BulletDiameter, BulletLength, BulletMass, Distance, DragCoefficient, FormFactor, LagTime, Pressure, RiflingTwist, SightCalibration, SpinDrift, Temperature, TimeOfFlight, Velocity, VelocityProjection, WindDeflection, WindSpeed
+    constants::{GyroscopicStability, KineticEnergy, SpeedOfSound},
+    AerodynamicJump, ApertureSightCalibration, BallisticCoefficient, BulletDiameter, BulletLength,
+    BulletWeight, Distance, DragCoefficient, FormFactor, LagTime, Pressure, RiflingTwist,
+    SightCalibration, SpinDrift, Temperature, TimeOfFlight, Velocity, VelocityProjection,
+    WindDeflection, WindSpeed,
 };
 
 #[bon]
@@ -30,7 +34,7 @@ impl KineticEnergy {
     /// # Returns
     /// A `KineticEnergy` instance representing the kinetic energy of the bullet.
     #[builder(finish_fn = solve)]
-    pub fn calculate(bullet_weight: BulletMass, velocity: Velocity) -> Self {
+    pub fn calculate(bullet_weight: BulletWeight, velocity: Velocity) -> Self {
         KineticEnergy((bullet_weight.0 * velocity.0.powi(2)) / 450800.0)
     }
 }
@@ -90,8 +94,8 @@ impl VelocityProjection {
     /// A `VelocityProjection` instance representing the projected velocity of the second bullet in ft/s.
     #[builder(finish_fn = solve)]
     pub fn calculate(
-        bullet_weight_1: BulletMass,
-        bullet_weight_2: BulletMass,
+        bullet_weight_1: BulletWeight,
+        bullet_weight_2: BulletWeight,
         bullet_velocity_1: Velocity,
     ) -> Self {
         VelocityProjection(bullet_velocity_1.0 * (bullet_weight_1.0 / bullet_weight_2.0).sqrt())
@@ -170,7 +174,7 @@ impl GyroscopicStability {
     /// Calculates the gyroscopic stability factor of a bullet using Miller's stability formula.
     ///
     /// # Parameters
-    /// - `bullet_mass`: The mass of the bullet in grains.
+    /// - `bullet_weight`: The weight of the bullet in grains.
     /// - `rifling_twist`: The rifling twist rate of the barrel in calibers per turn.
     /// - `bullet_diameter`: The diameter (caliber) of the bullet in inches.
     /// - `bullet_length`: The length of the bullet in calibers.
@@ -179,13 +183,13 @@ impl GyroscopicStability {
     /// A `GyroscopicStability` instance representing the gyroscopic stability factor of the bullet at 2800 ft/s.
     #[builder(finish_fn = solve)]
     pub fn calculate(
-        bullet_mass: BulletMass,
+        bullet_weight: BulletWeight,
         rifling_twist: RiflingTwist,
         bullet_diameter: BulletDiameter,
         bullet_length: BulletLength,
     ) -> Self {
         GyroscopicStability(
-            (30.0 * bullet_mass.0)
+            (30.0 * bullet_weight.0)
                 / (rifling_twist.0.powi(2)
                     * bullet_diameter.0.powi(3)
                     * bullet_length.0
@@ -249,7 +253,10 @@ impl SpinDrift {
     /// # Returns
     /// A `SpinDrift` instance representing the calculated spin drift of the bullet.
     #[builder(finish_fn = solve)]
-    pub fn calculate(gyro_stability: GyroscopicStability, actual_time_of_flight: TimeOfFlight) -> Self {
+    pub fn calculate(
+        gyro_stability: GyroscopicStability,
+        actual_time_of_flight: TimeOfFlight,
+    ) -> Self {
         SpinDrift(1.25 * (gyro_stability.0 + 1.2) * actual_time_of_flight.0.powf(1.83))
     }
 }
@@ -259,10 +266,10 @@ impl BallisticCoefficient {
     /// Calculates the ballistic coefficient of a bullet.
     ///
     /// The ballistic coefficient (BC) is a measure of a bullet's ability to overcome air resistance in flight.
-    /// It is calculated using the bullet's mass, diameter, and form factor.
+    /// It is calculated using the bullet's weight, diameter, and form factor.
     ///
     /// # Parameters
-    /// - `bullet_mass`: The mass of the bullet in grains.
+    /// - `bullet_weight`: The weight of the bullet in grains.
     /// - `bullet_diameter`: The diameter (caliber) of the bullet in inches.
     /// - `form_factor`: The form factor of the bullet, which is a unitless number that describes the bullet's shape.
     ///
@@ -270,10 +277,12 @@ impl BallisticCoefficient {
     /// A `BallisticCoefficient` instance representing the ballistic coefficient of the bullet.
     #[builder(finish_fn = solve)]
     pub fn calculate(
-        bullet_mass: BulletMass,
+        bullet_weight: BulletWeight,
         bullet_diameter: BulletDiameter,
         form_factor: FormFactor,
     ) -> Self {
-        BallisticCoefficient((bullet_mass.0 / 7000.0) / (bullet_diameter.0.powi(2) * form_factor.0))
+        BallisticCoefficient(
+            (bullet_weight.0 / 7000.0) / (bullet_diameter.0.powi(2) * form_factor.0),
+        )
     }
 }

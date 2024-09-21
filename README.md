@@ -36,10 +36,10 @@ println!("Speed of sound: {} ft/s", speed.0);
 Calculate the kinetic energy of a bullet:
 
 ```rust
-use ballistics_rs::{KineticEnergy, BulletMass, Velocity};
+use ballistics_rs::{KineticEnergy, BulletWeight, Velocity};
 
 let energy = KineticEnergy::calculate()
-    .bullet_weight(BulletMass(150.0))
+    .bullet_weight(BulletWeight(150.0))
     .velocity(Velocity(3000.0))
     .solve();
 
@@ -81,11 +81,11 @@ println!("Form factor: {}", form_factor.0);
 Project the velocity of a second bullet based on the weight and velocity of a first bullet:
 
 ```rust
-use ballistics_rs::{VelocityProjection, BulletMass, Velocity};
+use ballistics_rs::{VelocityProjection, BulletWeight, Velocity};
 
 let projected_velocity = VelocityProjection::calculate()
-    .bullet_weight_1(BulletMass(150.0))
-    .bullet_weight_2(BulletMass(180.0))
+    .bullet_weight_1(BulletWeight(150.0))
+    .bullet_weight_2(BulletWeight(180.0))
     .bullet_velocity_1(Velocity(3000.0))
     .solve();
 
@@ -143,10 +143,10 @@ println!("Aerodynamic jump: {} MOA", jump.0);
 Calculate the gyroscopic stability factor of a bullet:
 
 ```rust
-use ballistics_rs::{GyroscopicStability, BulletMass, RiflingTwist, BulletDiameter, BulletLength, Velocity, Temperature, Pressure};
+use ballistics_rs::{GyroscopicStability, BulletWeight, RiflingTwist, BulletDiameter, BulletLength, Velocity, Temperature, Pressure};
 
 let stability = GyroscopicStability::calculate()
-    .bullet_mass(BulletMass(150.0))
+    .bullet_weight(BulletWeight(150.0))
     .rifling_twist(RiflingTwist(10.0))
     .bullet_diameter(BulletDiameter(0.308))
     .bullet_length(BulletLength(4.0))
@@ -186,10 +186,10 @@ println!("Spin drift: {}", spin_drift.0);
 Calculate the ballistic coefficient of a bullet:
 
 ```rust
-use ballistics_rs::{BallisticCoefficient, BulletMass, BulletDiameter, FormFactor};
+use ballistics_rs::{BallisticCoefficient, BulletWeight, BulletDiameter, FormFactor};
 
 let bc = BallisticCoefficient::calculate()
-    .bullet_mass(BulletMass(150.0))
+    .bullet_weight(BulletWeight(150.0))
     .bullet_diameter(BulletDiameter(0.308))
     .form_factor(FormFactor(1.0))
     .solve();
