@@ -1,7 +1,7 @@
 use bon::bon;
 
 use crate::{
-    constants::{GyroscopicStability, KineticEnergy, SpeedOfSound}, AerodynamicJump, ApertureSightCalibration, BallisticCoefficient, BulletDiameter, BulletLength, BulletMass, Distance, DragCoefficient, FormFactor, LagTime, Pressure, RiflingTwist, SightCalibration, SpinDrift, Temperature, TimeOfFlight, Velocity, VelocityProjection, WindDeflection, WindSpeed
+    constants::{GyroscopicStability, KineticEnergy, SpeedOfSound}, AerodynamicJump, ApertureSightCalibration, BallisticCoefficient, BulletDiameter, BulletLength, BulletMass, Distance, DragCoefficient, FormFactor, LagTime, Pressure, RiflingTwist, SightCalibration, SpinDrift, Temperature, TimeOfFlight, UnitConversion, UnitSystem, Velocity, VelocityProjection, WindDeflection, WindSpeed
 };
 
 #[bon]
@@ -14,8 +14,17 @@ impl SpeedOfSound {
     /// # Returns
     /// A `SpeedOfSound` instance representing the speed of sound at the given temperature.
     #[builder(finish_fn = solve)]
-    pub fn calculate(temperature: Temperature) -> Self {
-        SpeedOfSound(49.0223 * (temperature.0 + 459.67).sqrt())
+    pub fn calculate(
+        temperature: Temperature, 
+        #[builder(default)] 
+        unit_system: UnitSystem
+    ) -> Self {
+        let speed = SpeedOfSound(49.0223 * (temperature.0 + 459.67).sqrt());
+        
+        match unit_system {
+            UnitSystem::Imperial => speed,
+            UnitSystem::SI => speed.convert(UnitSystem::SI)
+        }
     }
 }
 
@@ -30,8 +39,18 @@ impl KineticEnergy {
     /// # Returns
     /// A `KineticEnergy` instance representing the kinetic energy of the bullet.
     #[builder(finish_fn = solve)]
-    pub fn calculate(bullet_weight: BulletMass, velocity: Velocity) -> Self {
-        KineticEnergy((bullet_weight.0 * velocity.0.powi(2)) / 450800.0)
+    pub fn calculate(
+        bullet_weight: BulletMass, 
+        velocity: Velocity, 
+        #[builder(default)] 
+        unit_system: UnitSystem
+    ) -> Self {
+        let ke = KineticEnergy((bullet_weight.0 * velocity.0.powi(2)) / 450800.0);
+
+        match unit_system {
+            UnitSystem::Imperial => ke,
+            UnitSystem::SI => ke.convert(UnitSystem::SI)
+        }
     }
 }
 
