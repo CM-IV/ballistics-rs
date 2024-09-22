@@ -4,7 +4,7 @@ version = 3
 
 [[package]]
 name = "ballistics_rs"
-version = "0.1.4"
+version = "0.1.5"
 dependencies = [
  "bon",
  "synonym",
@@ -123,9 +123,9 @@ dependencies = [
 
 [[package]]
 name = "synonym"
-version = "0.1.5"
+version = "0.1.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b02a1bbd8ca915a9412236ac15dec5996a15c9c1250e687ef2689e4fddde7cb1"
+checksum = "5e5fd271874fac45215946c0364feab55cebe1e5524963d179398e0a388b7922"
 dependencies = [
  "darling",
  "proc-macro2",

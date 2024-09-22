@@ -1,24 +1,41 @@
+pub enum AccelerationUnit {
+    MetersPerSecondSquared,
+    FeetPerSecondSquared,
+}
+
 pub enum SpeedUnit {
-    FeetPerSecond,
     MetersPerSecond,
+    FeetPerSecond,
+    MilesPerHour,
 }
 
 pub enum DistanceUnit {
-    Feet,
     Meters,
+    Feet,
+    Inches,
 }
 
-pub enum MassUnit {
-    Grains,
+pub enum WeightUnit {
     Kilograms,
+    Grains,
 }
 
 pub enum TemperatureUnit {
-    Fahrenheit,
     Celsius,
+    Fahrenheit,
 }
 
 pub enum PressureUnit {
+    Pascal,
     InchesOfMercury,
-    Pascals,
+}
+
+pub enum DensityUnit {
+    KilogramsPerCubicMeter,
+    PoundsPerCubicFoot,
+}
+
+pub enum EnergyUnit {
+    Joules,
+    FootPounds,
 }
