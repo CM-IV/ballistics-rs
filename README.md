@@ -12,23 +12,34 @@ To use `ballistics_rs` in your project, add the following to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-ballistics_rs = "0.1.5"
+ballistics_rs = "0.2.*"
 ```
 
 ## Usage
+
+### Unit Systems
+
+This crate as of version `0.2.0` supports both Imperial and SI unit systems. You can specify the unit system when creating instances of the various types:
+
+```rust
+use ballistics_rs::{Imperial, SI, Temperature};
+
+let temp_imperial = Temperature::<Imperial>::new(68.0);
+let temp_si = Temperature::<SI>::new(20.0);
+```
 
 ### Speed of Sound
 
 Calculate the speed of sound in air given the temperature:
 
 ```rust
-use ballistics_rs::{SpeedOfSound, Temperature};
+use ballistics_rs::{SpeedOfSound, Temperature, Imperial};
 
-let speed = SpeedOfSound::calculate()
-    .temperature(Temperature(68.0))
+let speed = SpeedOfSound::<Imperial>::calculate()
+    .temperature(Temperature::new(68.0))
     .solve();
 
-println!("Speed of sound: {} ft/s", speed.0);
+println!("Speed of sound: {} ft/s", speed.value());
 ```
 
 ### Kinetic Energy
@@ -38,12 +49,12 @@ Calculate the kinetic energy of a bullet:
 ```rust
 use ballistics_rs::{KineticEnergy, BulletWeight, Velocity};
 
-let energy = KineticEnergy::calculate()
-    .bullet_weight(BulletWeight(150.0))
-    .velocity(Velocity(3000.0))
+let energy = KineticEnergy::<Imperial>::calculate()
+    .bullet_weight(BulletWeight::new(150.0))
+    .velocity(Velocity::new(3000.0))
     .solve();
 
-println!("Kinetic energy: {} ft-lbs", energy.0);
+println!("Kinetic energy: {} ft-lbs", energy.value());
 ```
 
 ### Aperture Sight Calibration

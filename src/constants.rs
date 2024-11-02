@@ -1,183 +1,475 @@
-use synonym::Synonym;
+use std::marker::PhantomData;
 
-/// Gravitational constant (ft/s²)
-///
-/// This struct represents the gravitational constant, which is the acceleration
-/// due to gravity on Earth's surface.
-#[derive(Synonym)]
-pub struct Gravity(pub f64);
+use derive_more::derive::{AsRef, Display, From};
 
-/// Speed of sound given temperature (ft/s)
-///
-/// This struct represents the speed of sound in air, which varies with temperature.
-#[derive(Synonym)]
-pub struct SpeedOfSound(pub f64);
+/// Represents the type of unit system being used.
+pub enum UnitSystemType {
+    /// Imperial unit system (e.g., feet, pounds, degrees Fahrenheit)
+    Imperial,
+    /// SI unit system (e.g., meters, kilograms, degrees Celsius)
+    SI,
+}
 
-/// Time of Flight (s)
-///
-/// This struct represents the time of flight (either actual or theoretical) in seconds of the projectile.
-#[derive(Synonym)]
-pub struct TimeOfFlight(pub f64);
+/// Trait for defining a unit system.
+pub trait UnitSystem {
+    /// Returns the type of unit system.
+    fn unit_system_type() -> UnitSystemType;
+}
 
-/// Distance (ft)
-///
-/// This struct represents distance traveled in feet.
-#[derive(Synonym)]
-pub struct Distance(pub f64);
+/// Represents the SI (International System of Units) unit system.
+pub struct SI;
 
-/// Wind Speed (mph)
-///
-/// This struct represents the wind speed in miles per hour.
-#[derive(Synonym)]
-pub struct WindSpeed(pub f64);
+/// Represents the Imperial unit system.
+pub struct Imperial;
 
-/// Spin Drift (in)
-///
-/// This struct represents the spin drift in inches in the direction of rifling twist.
-#[derive(Synonym)]
-pub struct SpinDrift(pub f64);
+impl UnitSystem for Imperial {
+    fn unit_system_type() -> UnitSystemType {
+        UnitSystemType::Imperial
+    }
+}
 
-/// Drag Coefficient
-///
-/// This struct represents the drag coefficient of a bullet at some speed.
-#[derive(Synonym)]
-pub struct DragCoefficient(pub f64);
+impl UnitSystem for SI {
+    fn unit_system_type() -> UnitSystemType {
+        UnitSystemType::SI
+    }
+}
 
-/// Rifling Twist (calibers per turn)
+/// Gravitational constant.
 ///
-/// This struct represents the rifling twist of the barrel in calibers per turn.
-#[derive(Synonym)]
-pub struct RiflingTwist(pub f64);
+/// For Imperial: ft/s²
+///
+/// For SI: m/s²
+#[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Default, Display, AsRef, From)]
+#[display("Gravity: {_0}")]
+pub struct Gravity<T: UnitSystem>(f64, PhantomData<T>);
 
-/// Bullet Length (calibers)
+/// Speed of sound given temperature.
 ///
-/// This struct represents the bullet's length in calibers.
-#[derive(Synonym)]
-pub struct BulletLength(pub f64);
+/// For Imperial: ft/s
+///
+/// For SI: m/s
+#[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Default, Display, AsRef, From)]
+#[display("Speed Of Sound: {_0}")]
+pub struct SpeedOfSound<T: UnitSystem>(f64, PhantomData<T>);
 
-/// Bullet Diameter (in)
+/// Time of Flight.
 ///
-/// This struct represents the diameter (caliber) of the bullet in inches.
-#[derive(Synonym)]
-pub struct BulletDiameter(pub f64);
+/// Measured in seconds for both Imperial and SI systems.
+#[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Default, Display, AsRef, From)]
+#[display("Time Of Flight: {_0}")]
+pub struct TimeOfFlight<T: UnitSystem>(f64, PhantomData<T>); // Time is the same in both systems
 
-/// Sight Calibration (in)
+/// Distance.
 ///
-/// This struct represents either the sight movement for 20 clicks or the sight radius in inches.
-#[derive(Synonym)]
-pub struct SightCalibration(pub f64);
+/// For Imperial: yards or feet
+///
+/// For SI: meters
+#[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Default, Display, AsRef, From)]
+#[display("Distance: {_0}")]
+pub struct Distance<T: UnitSystem>(f64, PhantomData<T>);
 
-/// Air density at sea level (lb/ft³)
+/// Wind Speed.
 ///
-/// This struct represents the the air density in pounds per cubic feet.
-#[derive(Synonym)]
-pub struct AirDensity(pub f64);
+/// For Imperial: mph
+///
+/// For SI: m/s
+#[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Default, Display, AsRef, From)]
+#[display("Wind Speed: {_0}")]
+pub struct WindSpeed<T: UnitSystem>(f64, PhantomData<T>);
 
-/// Lag time of a bullet in seconds (s)
+/// Spin Drift.
 ///
-/// This struct represents the bullet's lag time, used to determine wind deflection sensitivity.
-#[derive(Synonym)]
-pub struct LagTime(pub f64);
+/// For Imperial: inches
+///
+/// For SI: centimeters
+#[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Default, Display, AsRef, From)]
+#[display("Spin Drift: {_0}")]
+pub struct SpinDrift<T: UnitSystem>(f64, PhantomData<T>);
 
-/// Wind deflection of a bullet in inches (in)
+/// Drag Coefficient.
 ///
-/// This struct represents the bullet's wind deflection.
-#[derive(Synonym)]
-pub struct WindDeflection(pub f64);
+/// Dimensionless for both Imperial and SI systems.
+#[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Default, Display, AsRef, From)]
+#[display("Drag Coefficient: {_0}")]
+pub struct DragCoefficient<T: UnitSystem>(f64, PhantomData<T>);
 
-/// Get the velocity (ft/s) of a second bullet using the weight and velocity of another bullet.
+/// Rifling Twist.
 ///
-/// This struct represents the second bullet's velocity projection.
-#[derive(Synonym)]
-pub struct VelocityProjection(pub f64);
+/// Measured in calibers per turn, dimensionless for both Imperial and SI systems.
+#[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Default, Display, AsRef, From)]
+#[display("Rifling Twist: {_0}")]
+pub struct RiflingTwist<T: UnitSystem>(f64, PhantomData<T>);
 
-/// Aperture sight calibration value
+/// Bullet Length.
 ///
-/// This struct represents the calibration value for an aperture sight.
-#[derive(Synonym)]
-pub struct ApertureSightCalibration(pub f64);
+/// Measured in calibers, dimensionless for both Imperial and SI systems.
+#[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Default, Display, AsRef, From)]
+#[display("Bullet Length: {_0}")]
+pub struct BulletLength<T: UnitSystem>(f64, PhantomData<T>); // In calibers, dimensionless
 
-/// Form factor of a projectile
+/// Bullet Diameter.
 ///
-/// This struct represents the form factor of a projectile, which is a measure
-/// of how streamlined the projectile is. It affects the projectile's aerodynamic properties.
-#[derive(Synonym)]
-pub struct FormFactor(pub f64);
+/// For Imperial: inches
+///
+/// For SI: millimeters
+#[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Default, Display, AsRef, From)]
+#[display("Bullet Diameter: {_0}")]
+pub struct BulletDiameter<T: UnitSystem>(f64, PhantomData<T>);
 
-/// Aerodynamic jump of a projectile
+/// Sight Calibration.
 ///
-/// This struct represents the aerodynamic jump, which is the vertical deflection
-/// of a projectile's path as it leaves the muzzle, caused by aerodynamic forces.
-#[derive(Synonym)]
-pub struct AerodynamicJump(pub f64);
+/// For Imperial: MOA or inches
+///
+/// For SI: mils or centimeters
+#[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Default, Display, AsRef, From)]
+#[display("Sight Calibration: {_0}")]
+pub struct SightCalibration<T: UnitSystem>(f64, PhantomData<T>);
 
-/// Bullet weight (grains)
+/// Air density.
 ///
-/// This struct represents the weight of the bullet in grains.
-#[derive(Synonym)]
-pub struct BulletWeight(pub f64);
+/// For Imperial: lb/ft³
+///
+/// For SI: kg/m³
+#[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Default, Display, AsRef, From)]
+#[display("Air Density: {_0}")]
+pub struct AirDensity<T: UnitSystem>(f64, PhantomData<T>);
 
-/// Temperature (F)
+/// Lag time of a bullet in seconds.
 ///
-/// This struct represents the temperature in Fahrenheit.
-#[derive(Synonym)]
-pub struct Temperature(pub f64);
+/// Measured in seconds for both Imperial and SI systems.
+#[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Default, Display, AsRef, From)]
+#[display("Lag Time: {_0}")]
+pub struct LagTime<T: UnitSystem>(f64, PhantomData<T>); // Time is the same in both systems
 
-/// Pressure (inHg)
+/// Wind deflection of a bullet.
 ///
-/// This struct represents air pressure in inches of Mercury
-#[derive(Synonym)]
-pub struct Pressure(pub f64);
+/// For Imperial: inches
+///
+/// For SI: centimeters
+#[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Default, Display, AsRef, From)]
+#[display("Wind Deflection: {_0}")]
+pub struct WindDeflection<T: UnitSystem>(f64, PhantomData<T>);
 
-/// Velocity (ft/s)
+/// Velocity projection.
 ///
-/// This struct represents the bullet velocity in feet per second.
-#[derive(Synonym)]
-pub struct Velocity(pub f64);
+/// For Imperial: ft/s
+///
+/// For SI: m/s
+#[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Default, Display, AsRef, From)]
+#[display("Velocity Projection: {_0}")]
+pub struct VelocityProjection<T: UnitSystem>(f64, PhantomData<T>);
 
-/// Miller's Stability Formula (dimensionless)
+/// Aperture sight calibration value.
 ///
-/// This struct represents the gyroscopic stability factor of a projectile,
-/// calculated using Miller's stability formula.
-#[derive(Synonym)]
-pub struct GyroscopicStability(pub f64);
+/// Typically dimensionless for both Imperial and SI systems.
+#[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Default, Display, AsRef, From)]
+#[display("Aperture Sight Calibration: {_0}")]
+pub struct ApertureSightCalibration<T: UnitSystem>(f64, PhantomData<T>); // Typically dimensionless
 
-/// Kinetic Energy (ft-lb)
+/// Form factor of a projectile.
 ///
-/// This struct represents the kinetic energy of a projectile, which is the
-/// energy it possesses due to its motion.
-#[derive(Synonym)]
-pub struct KineticEnergy(pub f64);
+/// Dimensionless for both Imperial and SI systems.
+#[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Default, Display, AsRef, From)]
+#[display("Form Factor: {_0}")]
+pub struct FormFactor<T: UnitSystem>(f64, PhantomData<T>);
 
-/// Ballistic Coefficient (dimensionless)
+/// Aerodynamic jump of a projectile.
 ///
-/// This struct represents the ballistic coefficient of a projectile, which
-/// is a measure of its ability to overcome air resistance in flight.
-#[derive(Synonym)]
-pub struct BallisticCoefficient(pub f64);
+/// For Imperial: MOA
+///
+/// For SI: mils
+#[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Default, Display, AsRef, From)]
+#[display("Aerodynamic Jump: {_0}")]
+pub struct AerodynamicJump<T: UnitSystem>(f64, PhantomData<T>);
 
-/// Standard gravitational constant (ft/s²)
+/// Bullet weight.
 ///
-/// This constant represents the standard gravitational acceleration on Earth's
-/// surface, which is approximately 32.174 ft/s².
-pub const STANDARD_GRAVITY: Gravity = Gravity(32.174);
+/// For Imperial: grains
+///
+/// For SI: grams
+#[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Default, Display, AsRef, From)]
+#[display("Bullet Weight: {_0}")]
+pub struct BulletWeight<T: UnitSystem>(f64, PhantomData<T>);
 
-/// Speed of sound at sea level (ft/s)
+/// Temperature.
 ///
-/// This constant represents the speed of sound in feet per second at sea level.
-pub const SPEED_OF_SOUND_SEA_LEVEL: SpeedOfSound = SpeedOfSound(1116.28);
+/// For Imperial: degrees Fahrenheit
+///
+/// For SI: degrees Celsius
+#[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Default, Display, AsRef, From)]
+#[display("Temperature: {_0}")]
+pub struct Temperature<T: UnitSystem>(f64, PhantomData<T>);
 
-/// Air density at sea level (lb/ft³)
+/// Pressure.
 ///
-/// This constant represents the air density at sea level.
-pub const AIR_DENSITY_SEA_LEVEL: AirDensity = AirDensity(0.0765);
+/// For Imperial: inHg
+///
+/// For SI: hPa
+#[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Default, Display, AsRef, From)]
+#[display("Pressure: {_0}")]
+pub struct Pressure<T: UnitSystem>(f64, PhantomData<T>);
 
-/// ICAO definition of standard pressure (inHg)
+/// Velocity.
 ///
-/// This constant represents standard air pressure.
-pub const STANDARD_PRESSURE: Pressure = Pressure(29.92);
+/// For Imperial: ft/s
+///
+/// For SI: m/s
+#[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Default, Display, AsRef, From)]
+#[display("Velocity: {_0}")]
+pub struct Velocity<T: UnitSystem>(f64, PhantomData<T>);
 
-/// ICAO definition of standard temperature (F)
+/// Gyroscopic Stability.
 ///
-/// This constant represents standard temperature.
-pub const STANDARD_TEMPERATURE: Temperature = Temperature(59.0);
+/// Dimensionless for both Imperial and SI systems.
+#[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Default, Display, AsRef, From)]
+#[display("Gyroscopic Stability: {_0}")]
+pub struct GyroscopicStability<T: UnitSystem>(f64, PhantomData<T>);
+
+/// Kinetic Energy.
+///
+/// For Imperial: ft⋅lb
+///
+/// For SI: Joules
+#[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Default, Display, AsRef, From)]
+#[display("Kinetic Energy: {_0}")]
+pub struct KineticEnergy<T: UnitSystem>(f64, PhantomData<T>);
+
+/// Ballistic Coefficient.
+///
+/// Dimensionless for both Imperial and SI systems.
+///
+/// Typically, lb/in² for Imperial and kg/m² for SI, but often expressed as a unitless value.
+#[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Default, Display, AsRef, From)]
+#[display("Ballistic Coefficient: {_0}")]
+pub struct BallisticCoefficient<T: UnitSystem>(f64, PhantomData<T>);
+
+impl<T: UnitSystem> Gravity<T> {
+    pub const fn new(value: f64) -> Self {
+        Self(value, PhantomData)
+    }
+    pub fn value(&self) -> f64 {
+        self.0
+    }
+}
+
+impl<T: UnitSystem> SpeedOfSound<T> {
+    pub const fn new(value: f64) -> Self {
+        Self(value, PhantomData)
+    }
+    pub fn value(&self) -> f64 {
+        self.0
+    }
+}
+
+impl<T: UnitSystem> TimeOfFlight<T> {
+    pub const fn new(value: f64) -> Self {
+        Self(value, PhantomData)
+    }
+    pub fn value(&self) -> f64 {
+        self.0
+    }
+}
+
+impl<T: UnitSystem> Distance<T> {
+    pub const fn new(value: f64) -> Self {
+        Self(value, PhantomData)
+    }
+    pub fn value(&self) -> f64 {
+        self.0
+    }
+}
+
+impl<T: UnitSystem> WindSpeed<T> {
+    pub const fn new(value: f64) -> Self {
+        Self(value, PhantomData)
+    }
+    pub fn value(&self) -> f64 {
+        self.0
+    }
+}
+
+impl<T: UnitSystem> SpinDrift<T> {
+    pub const fn new(value: f64) -> Self {
+        Self(value, PhantomData)
+    }
+    pub fn value(&self) -> f64 {
+        self.0
+    }
+}
+
+impl<T: UnitSystem> DragCoefficient<T> {
+    pub const fn new(value: f64) -> Self {
+        Self(value, PhantomData)
+    }
+
+    pub fn value(&self) -> f64 {
+        self.0
+    }
+}
+
+impl<T: UnitSystem> RiflingTwist<T> {
+    pub const fn new(value: f64) -> Self {
+        Self(value, PhantomData)
+    }
+    pub fn value(&self) -> f64 {
+        self.0
+    }
+}
+
+impl<T: UnitSystem> BulletLength<T> {
+    pub const fn new(value: f64) -> Self {
+        Self(value, PhantomData)
+    }
+    pub fn value(&self) -> f64 {
+        self.0
+    }
+}
+
+impl<T: UnitSystem> BulletDiameter<T> {
+    pub const fn new(value: f64) -> Self {
+        Self(value, PhantomData)
+    }
+    pub fn value(&self) -> f64 {
+        self.0
+    }
+}
+
+impl<T: UnitSystem> SightCalibration<T> {
+    pub const fn new(value: f64) -> Self {
+        Self(value, PhantomData)
+    }
+    pub fn value(&self) -> f64 {
+        self.0
+    }
+}
+
+impl<T: UnitSystem> AirDensity<T> {
+    pub const fn new(value: f64) -> Self {
+        Self(value, PhantomData)
+    }
+    pub fn value(&self) -> f64 {
+        self.0
+    }
+}
+
+impl<T: UnitSystem> LagTime<T> {
+    pub const fn new(value: f64) -> Self {
+        Self(value, PhantomData)
+    }
+    pub fn value(&self) -> f64 {
+        self.0
+    }
+}
+
+impl<T: UnitSystem> WindDeflection<T> {
+    pub const fn new(value: f64) -> Self {
+        Self(value, PhantomData)
+    }
+    pub fn value(&self) -> f64 {
+        self.0
+    }
+}
+
+impl<T: UnitSystem> VelocityProjection<T> {
+    pub const fn new(value: f64) -> Self {
+        Self(value, PhantomData)
+    }
+}
+
+impl<T: UnitSystem> ApertureSightCalibration<T> {
+    pub const fn new(value: f64) -> Self {
+        Self(value, PhantomData)
+    }
+    pub fn value(&self) -> f64 {
+        self.0
+    }
+}
+
+impl<T: UnitSystem> FormFactor<T> {
+    pub const fn new(value: f64) -> Self {
+        Self(value, PhantomData)
+    }
+
+    pub fn value(&self) -> f64 {
+        self.0
+    }
+}
+
+impl<T: UnitSystem> AerodynamicJump<T> {
+    pub const fn new(value: f64) -> Self {
+        Self(value, PhantomData)
+    }
+    pub fn value(&self) -> f64 {
+        self.0
+    }
+}
+
+impl<T: UnitSystem> BulletWeight<T> {
+    pub const fn new(value: f64) -> Self {
+        Self(value, PhantomData)
+    }
+    pub fn value(&self) -> f64 {
+        self.0
+    }
+}
+
+impl<T: UnitSystem> Temperature<T> {
+    pub const fn new(value: f64) -> Self {
+        Self(value, PhantomData)
+    }
+    pub fn value(&self) -> f64 {
+        self.0
+    }
+}
+
+impl<T: UnitSystem> Pressure<T> {
+    pub const fn new(value: f64) -> Self {
+        Self(value, PhantomData)
+    }
+    pub fn value(&self) -> f64 {
+        self.0
+    }
+}
+
+impl<T: UnitSystem> Velocity<T> {
+    pub const fn new(value: f64) -> Self {
+        Self(value, PhantomData)
+    }
+    pub fn value(&self) -> f64 {
+        self.0
+    }
+}
+
+impl<T: UnitSystem> GyroscopicStability<T> {
+    pub const fn new(value: f64) -> Self {
+        Self(value, PhantomData)
+    }
+    pub fn value(&self) -> f64 {
+        self.0
+    }
+}
+
+impl<T: UnitSystem> KineticEnergy<T> {
+    pub const fn new(value: f64) -> Self {
+        Self(value, PhantomData)
+    }
+    pub fn value(&self) -> f64 {
+        self.0
+    }
+}
+
+impl<T: UnitSystem> BallisticCoefficient<T> {
+    pub const fn new(value: f64) -> Self {
+        Self(value, PhantomData)
+    }
+    pub fn value(&self) -> f64 {
+        self.0
+    }
+}
+
+/// Constants
+pub const STANDARD_GRAVITY: Gravity<Imperial> = Gravity::new(32.174);
+pub const SPEED_OF_SOUND_SEA_LEVEL: SpeedOfSound<Imperial> = SpeedOfSound::new(1116.28);
+pub const AIR_DENSITY_SEA_LEVEL: AirDensity<Imperial> = AirDensity::new(0.0765);
+pub const STANDARD_PRESSURE: Pressure<Imperial> = Pressure::new(29.92);
+pub const STANDARD_TEMPERATURE: Temperature<Imperial> = Temperature::new(59.0);

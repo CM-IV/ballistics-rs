@@ -1,10 +1,13 @@
 [dependencies]
-synonym = "0.1.6"
 bon = "2.3.0"
+derive_more = { version = "1.0.0", features = ["as_ref", "display", "from"] }
+
+[dev-dependencies]
+float-cmp = "*"
 
 [package]
 name = "ballistics_rs"
-version = "0.1.5"
+version = "0.2.0"
 authors = ["CM-IV"]
 edition = "2021"
 license = "MIT"
