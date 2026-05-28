@@ -140,15 +140,15 @@ pub struct WindDeflectionCalc;
 
 #[bon]
 impl WindDeflectionCalc {
-    /// `17.6 × W_mph × lag_s`  →  inches
+    /// `crosswind_speed × lag_time`  →  inches (native uom: Velocity × Time = Length)
     #[builder(finish_fn = solve)]
     pub fn calculate(
         lag_time: LagTime,
         crosswind_speed: WindSpeed,
     ) -> WindDeflection {
-        let lag = lag_time.get::<second>();
-        let w = crosswind_speed.get::<mile_per_hour>();
-        WindDeflection::new::<inch>(17.6 * w * lag)
+        // Direct uom arithmetic: WindSpeed × Time = Length. No magic constant.
+        let length: Distance = crosswind_speed * lag_time;
+        WindDeflection::new::<inch>(length.get::<inch>())
     }
 }
 
@@ -264,93 +264,34 @@ impl BallisticCoefficientCalc {
 }
 
 // ---------------------------------------------------------------------------
-// Compatibility extension traits so users can still write
-// `KineticEnergy::calculate()` instead of `KineticEnergyCalc::calculate()`.
-// These bridge the free-function builders to the old API.
+// Compatibility extension traits.
+//
+// Only types with a UNIQUE underlying uom quantity can have an extension
+// trait (otherwise multiple traits would define `calculate()` for the same
+// type, causing ambiguity).  Types that share an underlying uom alias
+// (Velocity, Ratio, Angle, Length) must use their marker struct directly:
+//   SpeedOfSoundCalc::calculate()   (not SpeedOfSound::calculate())
+//   GyroscopicStabilityCalc::calculate()
+//   etc.
+//
+// KineticEnergy and LagTime are the only types with a unique uom base,
+// so they get extension traits.
 // ---------------------------------------------------------------------------
 
 /// Old-style entry point for [`KineticEnergyCalc`].
-#[allow(unused_variables)]
+/// Only works because `KineticEnergy` uniquely aliases `uom::Energy`.
 pub trait KineticEnergyExt {
     fn calculate() -> KineticEnergyCalcCalculateBuilder;
 }
-#[allow(unused_variables)]
 impl KineticEnergyExt for KineticEnergy {
     fn calculate() -> KineticEnergyCalcCalculateBuilder {
         KineticEnergyCalc::calculate()
     }
 }
 
-/// Old-style entry point for [`SpeedOfSoundCalc`].
-#[allow(unused_variables)]
-pub trait SpeedOfSoundExt {
-    fn calculate() -> SpeedOfSoundCalcCalculateBuilder;
-}
-#[allow(unused_variables)]
-impl SpeedOfSoundExt for SpeedOfSound {
-    fn calculate() -> SpeedOfSoundCalcCalculateBuilder {
-        SpeedOfSoundCalc::calculate()
-    }
-}
-
-/// Old-style entry point for [`ApertureSightCalibrationCalc`].
-#[allow(unused_variables)]
-pub trait ApertureSightCalibrationExt {
-    fn calculate(
-        sight_movement_twenty_clicks: SightCalibration,
-        sight_radius: SightCalibration,
-    ) -> ApertureSightCalibrationCalcCalculateBuilder;
-}
-#[allow(unused_variables)]
-impl ApertureSightCalibrationExt for ApertureSightCalibration {
-    fn calculate(
-        sight_movement_twenty_clicks: SightCalibration,
-        sight_radius: SightCalibration,
-    ) -> ApertureSightCalibrationCalcCalculateBuilder {
-        ApertureSightCalibrationCalc::calculate()
-    }
-}
-
-/// Old-style entry point for [`FormFactorCalc`].
-#[allow(unused_variables)]
-pub trait FormFactorExt {
-    fn calculate(
-        drag_coefficient: DragCoefficient,
-        standard_bullet_drag_coefficient: DragCoefficient,
-    ) -> FormFactorCalcCalculateBuilder;
-}
-#[allow(unused_variables)]
-impl FormFactorExt for FormFactor {
-    fn calculate(
-        drag_coefficient: DragCoefficient,
-        standard_bullet_drag_coefficient: DragCoefficient,
-    ) -> FormFactorCalcCalculateBuilder {
-        FormFactorCalc::calculate()
-    }
-}
-
-/// Old-style entry point for [`VelocityProjectionCalc`].
-#[allow(unused_variables)]
-pub trait VelocityProjectionExt {
-    fn calculate(
-        bullet_weight_1: BulletWeight,
-        bullet_weight_2: BulletWeight,
-        bullet_velocity_1: Velocity,
-    ) -> VelocityProjectionCalcCalculateBuilder;
-}
-#[allow(unused_variables)]
-impl VelocityProjectionExt for VelocityProjection {
-    fn calculate(
-        bullet_weight_1: BulletWeight,
-        bullet_weight_2: BulletWeight,
-        bullet_velocity_1: Velocity,
-    ) -> VelocityProjectionCalcCalculateBuilder {
-        VelocityProjectionCalc::calculate()
-    }
-}
-
 /// Old-style entry point for [`LagTimeCalc`].
-#[allow(unused_variables)]
+/// Only works because `LagTime` uniquely aliases `uom::Time` (TimeOfFlight
+/// has no `calculate` method, so no conflict).
 pub trait LagTimeExt {
     fn calculate(
         actual_time_of_flight: TimeOfFlight,
@@ -358,131 +299,13 @@ pub trait LagTimeExt {
         muzzle_velocity: Velocity,
     ) -> LagTimeCalcCalculateBuilder;
 }
-#[allow(unused_variables)]
 impl LagTimeExt for LagTime {
+    #[allow(unused_variables)]
     fn calculate(
         actual_time_of_flight: TimeOfFlight,
         distance: Distance,
         muzzle_velocity: Velocity,
     ) -> LagTimeCalcCalculateBuilder {
         LagTimeCalc::calculate()
-    }
-}
-
-/// Old-style entry point for [`WindDeflectionCalc`].
-#[allow(unused_variables)]
-pub trait WindDeflectionExt {
-    fn calculate(
-        lag_time: LagTime,
-        crosswind_speed: WindSpeed,
-    ) -> WindDeflectionCalcCalculateBuilder;
-}
-#[allow(unused_variables)]
-impl WindDeflectionExt for WindDeflection {
-    fn calculate(
-        lag_time: LagTime,
-        crosswind_speed: WindSpeed,
-    ) -> WindDeflectionCalcCalculateBuilder {
-        WindDeflectionCalc::calculate()
-    }
-}
-
-/// Old-style entry point for [`AerodynamicJumpCalc`].
-#[allow(unused_variables)]
-pub trait AerodynamicJumpExt {
-    fn calculate(
-        gyro_stability: GyroscopicStability,
-        bullet_length: BulletLength,
-    ) -> AerodynamicJumpCalcCalculateBuilder;
-}
-#[allow(unused_variables)]
-impl AerodynamicJumpExt for AerodynamicJump {
-    fn calculate(
-        gyro_stability: GyroscopicStability,
-        bullet_length: BulletLength,
-    ) -> AerodynamicJumpCalcCalculateBuilder {
-        AerodynamicJumpCalc::calculate()
-    }
-}
-
-/// Old-style entry point for [`GyroscopicStabilityCalc`].
-#[allow(unused_variables)]
-pub trait GyroscopicStabilityExt {
-    fn calculate(
-        bullet_weight: BulletWeight,
-        rifling_twist: RiflingTwist,
-        bullet_diameter: BulletDiameter,
-        bullet_length: BulletLength,
-    ) -> GyroscopicStabilityCalcCalculateBuilder;
-    fn velocity_correction(
-        muzzle_velocity: Velocity,
-        gyro_stability: GyroscopicStability,
-    ) -> GyroscopicStabilityCalcVelocityCorrectionBuilder;
-    fn atmospheric_correction(
-        air_temp: Temperature,
-        air_pressure: Pressure,
-        gyro_stability: GyroscopicStability,
-    ) -> GyroscopicStabilityCalcAtmosphericCorrectionBuilder;
-}
-#[allow(unused_variables)]
-impl GyroscopicStabilityExt for GyroscopicStability {
-    fn calculate(
-        bullet_weight: BulletWeight,
-        rifling_twist: RiflingTwist,
-        bullet_diameter: BulletDiameter,
-        bullet_length: BulletLength,
-    ) -> GyroscopicStabilityCalcCalculateBuilder {
-        GyroscopicStabilityCalc::calculate()
-    }
-    fn velocity_correction(
-        muzzle_velocity: Velocity,
-        gyro_stability: GyroscopicStability,
-    ) -> GyroscopicStabilityCalcVelocityCorrectionBuilder {
-        GyroscopicStabilityCalc::velocity_correction()
-    }
-    fn atmospheric_correction(
-        air_temp: Temperature,
-        air_pressure: Pressure,
-        gyro_stability: GyroscopicStability,
-    ) -> GyroscopicStabilityCalcAtmosphericCorrectionBuilder {
-        GyroscopicStabilityCalc::atmospheric_correction()
-    }
-}
-
-/// Old-style entry point for [`SpinDriftCalc`].
-#[allow(unused_variables)]
-pub trait SpinDriftExt {
-    fn calculate(
-        gyro_stability: GyroscopicStability,
-        actual_time_of_flight: TimeOfFlight,
-    ) -> SpinDriftCalcCalculateBuilder;
-}
-#[allow(unused_variables)]
-impl SpinDriftExt for SpinDrift {
-    fn calculate(
-        gyro_stability: GyroscopicStability,
-        actual_time_of_flight: TimeOfFlight,
-    ) -> SpinDriftCalcCalculateBuilder {
-        SpinDriftCalc::calculate()
-    }
-}
-
-/// Old-style entry point for [`BallisticCoefficientCalc`].
-#[allow(unused_variables)]
-pub trait BallisticCoefficientExt {
-    fn calculate(
-        bullet_weight: BulletWeight,
-        bullet_diameter: BulletDiameter,
-        form_factor: FormFactor,
-    ) -> BallisticCoefficientCalcCalculateBuilder;
-}
-#[allow(unused_variables)]
-impl BallisticCoefficientExt for BallisticCoefficient {
-    fn calculate(
-        bullet_weight: BulletWeight,
-        bullet_diameter: BulletDiameter,
-        form_factor: FormFactor,
-    ) -> BallisticCoefficientCalcCalculateBuilder {
-        BallisticCoefficientCalc::calculate()
     }
 }
