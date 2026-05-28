@@ -42,3 +42,16 @@ pub mod prelude {
 // Crate-root glob re-export preserves `use ballistics_rs::*;` ergonomics
 // for code migrated from 0.1.x.
 pub use crate::prelude::*;
+
+/// Demonstrates that the type system rejects mixing incompatible units:
+///
+/// ```compile_fail
+/// use ballistics_rs::prelude::*;
+/// // Passing a Velocity where a LagTime is expected must NOT compile:
+/// let _ = WindDeflection::calculate()
+///     .lag_time(Velocity::new::<foot_per_second>(10.0))
+///     .crosswind_speed(WindSpeed::new::<mile_per_hour>(5.0))
+///     .solve();
+/// ```
+#[allow(dead_code)]
+fn _compile_fail_marker_lag_time_must_be_time() {}
