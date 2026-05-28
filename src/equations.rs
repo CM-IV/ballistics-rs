@@ -118,17 +118,18 @@ pub struct LagTimeCalc;
 
 #[bon]
 impl LagTimeCalc {
-    /// `t_actual − D / V₀`  →  seconds
+    /// `t_actual − D / V₀`  →  seconds (native uom: Time − Length / Velocity = Time)
     #[builder(finish_fn = solve)]
     pub fn calculate(
         actual_time_of_flight: TimeOfFlight,
         distance: Distance,
         muzzle_velocity: Velocity,
     ) -> LagTime {
-        let t = actual_time_of_flight.get::<second>();
-        let d = distance.get::<foot>();
-        let v = muzzle_velocity.get::<foot_per_second>();
-        LagTime::new::<second>(t - d / v)
+        // Direct uom arithmetic: Length / Velocity = Time. No manual extraction.
+        let vacuum_time: TimeOfFlight = distance / muzzle_velocity;
+        LagTime::new::<second>(
+            actual_time_of_flight.get::<second>() - vacuum_time.get::<second>(),
+        )
     }
 }
 
