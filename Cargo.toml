@@ -17,7 +17,7 @@ homepage = "https://github.com/CM-IV/ballistics-rs"
 # optimize for size
 [profile.release]
 lto = "fat"
-opt-level = "z"
+opt-level = "s"
 debug = 0
 overflow-checks = false
 panic = "abort"
