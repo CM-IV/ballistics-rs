@@ -42,20 +42,30 @@ pub fn standard_temperature() -> Temperature {
 
 #[deprecated(since = "0.2.0", note = "use `standard_gravity()`")]
 #[allow(non_snake_case)]
-pub fn STANDARD_GRAVITY() -> Gravity { standard_gravity() }
+pub fn STANDARD_GRAVITY() -> Gravity {
+    standard_gravity()
+}
 
 #[deprecated(since = "0.2.0", note = "use `speed_of_sound_sea_level()`")]
 #[allow(non_snake_case)]
-pub fn SPEED_OF_SOUND_SEA_LEVEL() -> SpeedOfSound { speed_of_sound_sea_level() }
+pub fn SPEED_OF_SOUND_SEA_LEVEL() -> SpeedOfSound {
+    speed_of_sound_sea_level()
+}
 
 #[deprecated(since = "0.2.0", note = "use `air_density_sea_level()`")]
 #[allow(non_snake_case)]
-pub fn AIR_DENSITY_SEA_LEVEL() -> AirDensity { air_density_sea_level() }
+pub fn AIR_DENSITY_SEA_LEVEL() -> AirDensity {
+    air_density_sea_level()
+}
 
 #[deprecated(since = "0.2.0", note = "use `standard_pressure()`")]
 #[allow(non_snake_case)]
-pub fn STANDARD_PRESSURE() -> Pressure { standard_pressure() }
+pub fn STANDARD_PRESSURE() -> Pressure {
+    standard_pressure()
+}
 
 #[deprecated(since = "0.2.0", note = "use `standard_temperature()`")]
 #[allow(non_snake_case)]
-pub fn STANDARD_TEMPERATURE() -> Temperature { standard_temperature() }
+pub fn STANDARD_TEMPERATURE() -> Temperature {
+    standard_temperature()
+}

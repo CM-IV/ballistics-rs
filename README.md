@@ -5,208 +5,214 @@
 
 `ballistics_rs` is a Rust crate designed for external ballistics calculations. It provides utilities and equations to help developers create ballistics solver programs. This crate includes functions to calculate the speed of sound, kinetic energy, gyroscopic stability, and ballistic coefficient of projectiles.
 
-
 ## Getting Started
 
 To use `ballistics_rs` in your project, add the following to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-ballistics_rs = "0.1.5"
+ballistics_rs = "0.2.0"
 ```
 
 ## Usage
 
-### Speed of Sound
+All calculations use the `bon` builder pattern: call `::calculate()` on the calculation type, chain parameters by name, then call `.solve()` to get the result.
 
-Calculate the speed of sound in air given the temperature:
+### Quick Example
 
 ```rust
-use ballistics_rs::{SpeedOfSound, Temperature};
+use ballistics_rs::prelude::*;
 
-let speed = SpeedOfSound::calculate()
-    .temperature(Temperature(68.0))
+let energy = KineticEnergy::calculate()
+    .bullet_weight(BulletWeight::new::<grain>(150.0))
+    .velocity(Velocity::new::<foot_per_second>(3000.0))
     .solve();
 
-println!("Speed of sound: {} ft/s", speed.0);
+println!("Kinetic energy: {:.0} ft·lb", energy.get::<foot_pound>());
+```
+
+### Speed of Sound
+
+```rust
+use ballistics_rs::prelude::*;
+
+let speed = SpeedOfSoundCalc::calculate()
+    .temperature(Temperature::new::<degree_fahrenheit>(68.0))
+    .solve();
+
+println!("Speed of sound: {} ft/s", speed.get::<foot_per_second>());
 ```
 
 ### Kinetic Energy
 
-Calculate the kinetic energy of a bullet:
-
 ```rust
-use ballistics_rs::{KineticEnergy, BulletWeight, Velocity};
+use ballistics_rs::prelude::*;
 
 let energy = KineticEnergy::calculate()
-    .bullet_weight(BulletWeight(150.0))
-    .velocity(Velocity(3000.0))
+    .bullet_weight(BulletWeight::new::<grain>(150.0))
+    .velocity(Velocity::new::<foot_per_second>(3000.0))
     .solve();
 
-println!("Kinetic energy: {} ft-lbs", energy.0);
+println!("Kinetic energy: {:.0} ft·lb", energy.get::<foot_pound>());
 ```
 
 ### Aperture Sight Calibration
 
-Determine the movement of your point of aim for each click of an aperture:
-
 ```rust
-use ballistics_rs::{ApertureSightCalibration, SightCalibration};
+use ballistics_rs::prelude::*;
 
-let calibration = ApertureSightCalibration::calculate()
-    .sight_movement_twenty_clicks(SightCalibration(0.1))
-    .sight_radius(SightCalibration(28.0))
+let calibration = ApertureSightCalibrationCalc::calculate()
+    .sight_movement_twenty_clicks(SightCalibration::new::<inch>(0.1))
+    .sight_radius(SightCalibration::new::<inch>(28.0))
     .solve();
 
-println!("MOA per click: {}", calibration.0);
+println!("MOA per click: {:.2}", calibration.get::<moa>());
 ```
 
 ### Form Factor
 
-Calculate the form factor of a bullet:
-
 ```rust
-use ballistics_rs::{FormFactor, DragCoefficient};
+use ballistics_rs::prelude::*;
 
-let form_factor = FormFactor::calculate()
-    .drag_coefficient(DragCoefficient(0.223))
-    .standard_bullet_drag_coefficient(DragCoefficient(0.2))
+let form_factor = FormFactorCalc::calculate()
+    .drag_coefficient(DragCoefficient::new::<ratio>(0.223))
+    .standard_bullet_drag_coefficient(DragCoefficient::new::<ratio>(0.2))
     .solve();
 
-println!("Form factor: {}", form_factor.0);
+println!("Form factor: {:.4}", form_factor.get::<ratio>());
 ```
 
 ### Velocity Projection
 
-Project the velocity of a second bullet based on the weight and velocity of a first bullet:
-
 ```rust
-use ballistics_rs::{VelocityProjection, BulletWeight, Velocity};
+use ballistics_rs::prelude::*;
 
-let projected_velocity = VelocityProjection::calculate()
-    .bullet_weight_1(BulletWeight(150.0))
-    .bullet_weight_2(BulletWeight(180.0))
-    .bullet_velocity_1(Velocity(3000.0))
+let projected_velocity = VelocityProjectionCalc::calculate()
+    .bullet_weight_1(BulletWeight::new::<grain>(150.0))
+    .bullet_weight_2(BulletWeight::new::<grain>(180.0))
+    .bullet_velocity_1(Velocity::new::<foot_per_second>(3000.0))
     .solve();
 
-println!("Projected velocity of second bullet: {} ft/s", projected_velocity.0);
+println!("Projected velocity: {} ft/s", projected_velocity.get::<foot_per_second>());
 ```
 
 ### Lag Time
 
-Calculate the lag time of a bullet:
-
 ```rust
-use ballistics_rs::{LagTime, TimeOfFlight, Distance, Velocity};
+use ballistics_rs::prelude::*;
 
-let lag_time = LagTime::calculate()
-    .actual_time_of_flight(TimeOfFlight(1.2))
-    .distance(Distance(1000.0))
-    .muzzle_velocity(Velocity(3000.0))
+let lag_time = LagTimeCalc::calculate()
+    .actual_time_of_flight(TimeOfFlight::new::<second>(1.2))
+    .distance(Distance::new::<foot>(1000.0))
+    .muzzle_velocity(Velocity::new::<foot_per_second>(3000.0))
     .solve();
 
-println!("Lag time: {} seconds", lag_time.0);
+println!("Lag time: {:.4} seconds", lag_time.get::<second>());
 ```
 
 ### Wind Deflection
 
-Calculate the wind deflection of a bullet:
-
 ```rust
-use ballistics_rs::{WindDeflection, LagTime, WindSpeed};
+use ballistics_rs::prelude::*;
 
-let wind_deflection = WindDeflection::calculate()
-    .lag_time(LagTime(0.1))
-    .crosswind_speed(WindSpeed(10.0))
+let wind_deflection = WindDeflectionCalc::calculate()
+    .lag_time(LagTime::new::<second>(0.1))
+    .crosswind_speed(WindSpeed::new::<mile_per_hour>(10.0))
     .solve();
 
-println!("Wind deflection: {} inches", wind_deflection.0);
+println!("Wind deflection: {:.2} inches", wind_deflection.get::<inch>());
 ```
 
 ### Aerodynamic Jump
 
-Calculate the aerodynamic jump of a bullet:
-
 ```rust
-use ballistics_rs::{AerodynamicJump, GyroscopicStability, BulletLength};
+use ballistics_rs::prelude::*;
 
-let jump = AerodynamicJump::calculate()
-    .gyro_stability(GyroscopicStability(1.5))
-    .bullet_length(BulletLength(4.0))
+let jump = AerodynamicJumpCalc::calculate()
+    .gyro_stability(GyroscopicStability::new::<ratio>(1.5))
+    .bullet_length(BulletLength::new::<ratio>(4.0))
     .solve();
 
-println!("Aerodynamic jump: {} MOA", jump.0);
+println!("Aerodynamic jump: {:.4} MOA", jump.get::<moa>());
 ```
 
 ### Gyroscopic Stability
 
-Calculate the gyroscopic stability factor of a bullet:
-
 ```rust
-use ballistics_rs::{GyroscopicStability, BulletWeight, RiflingTwist, BulletDiameter, BulletLength, Velocity, Temperature, Pressure};
+use ballistics_rs::prelude::*;
 
-let stability = GyroscopicStability::calculate()
-    .bullet_weight(BulletWeight(150.0))
-    .rifling_twist(RiflingTwist(10.0))
-    .bullet_diameter(BulletDiameter(0.308))
-    .bullet_length(BulletLength(4.0))
+let stability = GyroscopicStabilityCalc::calculate()
+    .bullet_weight(BulletWeight::new::<grain>(150.0))
+    .rifling_twist(RiflingTwist::new::<ratio>(10.0))
+    .bullet_diameter(BulletDiameter::new::<inch>(0.308))
+    .bullet_length(BulletLength::new::<ratio>(4.0))
     .solve();
 
-let velocity_corrected = GyroscopicStability::velocity_correction()
-    .muzzle_velocity(Velocity(3000.0))
+let velocity_corrected = GyroscopicStabilityCalc::velocity_correction()
+    .muzzle_velocity(Velocity::new::<foot_per_second>(3000.0))
     .gyro_stability(stability)
     .solve();
 
-let atmospheric_corrected = GyroscopicStability::atmospheric_correction()
-    .air_temp(Temperature(68.0))
-    .air_pressure(Pressure(29.92))
+let atmospheric_corrected = GyroscopicStabilityCalc::atmospheric_correction()
+    .air_temp(Temperature::new::<degree_fahrenheit>(68.0))
+    .air_pressure(Pressure::new::<inch_of_mercury>(29.92))
     .gyro_stability(velocity_corrected)
     .solve();
 
-println!("Gyroscopic stability factor: {}", atmospheric_corrected.0);
+println!("Gyroscopic stability: {:.4}", atmospheric_corrected.get::<ratio>());
 ```
 
 ### Spin Drift
 
-Calculate the spin drift of a bullet in the direction of rifling twist:
-
 ```rust
-use ballistics_rs::{GyroscopicStability, TimeOfFlight, SpinDrift};
+use ballistics_rs::prelude::*;
 
-let spin_drift = SpinDrift::calculate()
-    .gyro_stability(GyroscopicStability(1.5))
-    .actual_time_of_flight(TimeOfFlight(1.2))
+let spin_drift = SpinDriftCalc::calculate()
+    .gyro_stability(GyroscopicStability::new::<ratio>(1.5))
+    .actual_time_of_flight(TimeOfFlight::new::<second>(1.2))
     .solve();
 
-println!("Spin drift: {}", spin_drift.0);
+println!("Spin drift: {:.2} inches", spin_drift.get::<inch>());
 ```
 
 ### Ballistic Coefficient
 
-Calculate the ballistic coefficient of a bullet:
-
 ```rust
-use ballistics_rs::{BallisticCoefficient, BulletWeight, BulletDiameter, FormFactor};
+use ballistics_rs::prelude::*;
 
-let bc = BallisticCoefficient::calculate()
-    .bullet_weight(BulletWeight(150.0))
-    .bullet_diameter(BulletDiameter(0.308))
-    .form_factor(FormFactor(1.0))
+let bc = BallisticCoefficientCalc::calculate()
+    .bullet_weight(BulletWeight::new::<grain>(150.0))
+    .bullet_diameter(BulletDiameter::new::<inch>(0.308))
+    .form_factor(FormFactor::new::<ratio>(1.0))
     .solve();
 
-println!("Ballistic coefficient: {}", bc.0);
+println!("Ballistic coefficient: {:.4}", bc.get::<ratio>());
 ```
 
 ### Constants
 
-The crate also provides several constants for use in calculations:
+```rust
+use ballistics_rs::prelude::*;
+
+println!("Speed of sound at sea level: {:.2} ft/s", speed_of_sound_sea_level().get::<foot_per_second>());
+println!("Air density at sea level: {:.4} lb/ft³", air_density_sea_level().get::<pound_per_cubic_foot>());
+println!("Standard gravity: {:.3} ft/s²", standard_gravity().get::<foot_per_second_squared>());
+println!("Standard pressure: {:.2} inHg", standard_pressure().get::<inch_of_mercury>());
+println!("Standard temperature: {:.1} °F", standard_temperature().get::<degree_fahrenheit>());
+```
+
+## Unit Safety
+
+`ballistics_rs` 0.2 uses [`uom`](https://docs.rs/uom) for compile-time dimensional analysis. The compiler will reject code that mixes incompatible units — for example, passing a `Velocity` where a `Time` is expected will not compile.
 
 ```rust
-use ballistics_rs::constants::{STANDARD_GRAVITY, SPEED_OF_SOUND_SEA_LEVEL, AIR_DENSITY_SEA_LEVEL, STANDARD_PRESSURE, STANDARD_TEMPERATURE};
+use ballistics_rs::prelude::*;
 
-println!("Speed of Sound at Sea Level: {} ft/s", SPEED_OF_SOUND_SEA_LEVEL.0);
-println!("Air Density at Sea Level: {} lb/ft³", AIR_DENSITY_SEA_LEVEL.0);
-println!("Standard Gravity: {} ft/s²", STANDARD_GRAVITY.0);
-println!("Standard Pressure: {} inHg", STANDARD_PRESSURE.0);
-println!("Standard Temperature: {} F", STANDARD_TEMPERATURE.0);
+// This will NOT compile — Velocity cannot be used where LagTime is expected:
+// let _ = WindDeflectionCalc::calculate()
+//     .lag_time(Velocity::new::<foot_per_second>(10.0))
+//     .crosswind_speed(WindSpeed::new::<mile_per_hour>(5.0))
+//     .solve();
 ```
+
+See [MIGRATION.md](MIGRATION.md) for details on migrating from 0.1.x.

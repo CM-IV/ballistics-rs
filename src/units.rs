@@ -19,35 +19,35 @@
 // They exist for readability of signatures and documentation; the *builder
 // method names* in `equations.rs` disambiguate them at call sites.
 
-pub use uom::si::f64::Acceleration            as Gravity;
-pub use uom::si::f64::Velocity;
-pub use uom::si::f64::Time                    as TimeOfFlight;
-pub use uom::si::f64::Length                  as Distance;
-pub use uom::si::f64::MassDensity             as AirDensity;
-pub use uom::si::f64::Mass                    as BulletWeight;
-pub use uom::si::f64::ThermodynamicTemperature as Temperature;
+pub use uom::si::f64::Acceleration as Gravity;
+pub use uom::si::f64::Angle;
+pub use uom::si::f64::Energy as KineticEnergy;
+pub use uom::si::f64::Length as Distance;
+pub use uom::si::f64::Mass as BulletWeight;
+pub use uom::si::f64::MassDensity as AirDensity;
 pub use uom::si::f64::Pressure;
 pub use uom::si::f64::Ratio;
-pub use uom::si::f64::Angle;
-pub use uom::si::f64::Energy                  as KineticEnergy;
+pub use uom::si::f64::ThermodynamicTemperature as Temperature;
+pub use uom::si::f64::Time as TimeOfFlight;
+pub use uom::si::f64::Velocity;
 
 // Secondary aliases over types already imported above. These are plain
 // `pub type` (not `pub use`) so that rustdoc renders them as distinct items.
-pub type SpeedOfSound             = Velocity;
-pub type WindSpeed                = Velocity;
-pub type VelocityProjection       = Velocity;
-pub type LagTime                  = uom::si::f64::Time;
-pub type BulletDiameter           = uom::si::f64::Length;
-pub type SpinDrift                = uom::si::f64::Length;
-pub type WindDeflection           = uom::si::f64::Length;
-pub type SightCalibration         = uom::si::f64::Length;
-pub type BulletLength             = Ratio;
-pub type RiflingTwist             = Ratio;
-pub type DragCoefficient          = Ratio;
-pub type FormFactor               = Ratio;
-pub type GyroscopicStability      = Ratio;
-pub type BallisticCoefficient     = Ratio;
-pub type AerodynamicJump          = Angle;
+pub type SpeedOfSound = Velocity;
+pub type WindSpeed = Velocity;
+pub type VelocityProjection = Velocity;
+pub type LagTime = uom::si::f64::Time;
+pub type BulletDiameter = uom::si::f64::Length;
+pub type SpinDrift = uom::si::f64::Length;
+pub type WindDeflection = uom::si::f64::Length;
+pub type SightCalibration = uom::si::f64::Length;
+pub type BulletLength = Ratio;
+pub type RiflingTwist = Ratio;
+pub type DragCoefficient = Ratio;
+pub type FormFactor = Ratio;
+pub type GyroscopicStability = Ratio;
+pub type BallisticCoefficient = Ratio;
+pub type AerodynamicJump = Angle;
 pub type ApertureSightCalibration = Angle;
 
 // ---------------------------------------------------------------------------
@@ -56,15 +56,15 @@ pub type ApertureSightCalibration = Angle;
 // ---------------------------------------------------------------------------
 
 pub use uom::si::acceleration::foot_per_second_squared;
-pub use uom::si::velocity::{foot_per_second, mile_per_hour};
-pub use uom::si::time::second;
-pub use uom::si::length::{foot, inch};
-pub use uom::si::mass_density::pound_per_cubic_foot;
-pub use uom::si::mass::grain;
-pub use uom::si::thermodynamic_temperature::degree_fahrenheit;
-pub use uom::si::pressure::inch_of_mercury;
 pub use uom::si::energy::foot_pound;
+pub use uom::si::length::{foot, inch};
+pub use uom::si::mass::grain;
+pub use uom::si::mass_density::pound_per_cubic_foot;
+pub use uom::si::pressure::inch_of_mercury;
 pub use uom::si::ratio::ratio;
+pub use uom::si::thermodynamic_temperature::degree_fahrenheit;
+pub use uom::si::time::second;
+pub use uom::si::velocity::{foot_per_second, mile_per_hour};
 
 /// Minute of arc — the ballistics community's "MOA". Re-export of
 /// `uom::si::angle::minute` under a domain-friendlier name.

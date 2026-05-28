@@ -127,9 +127,7 @@ impl LagTimeCalc {
     ) -> LagTime {
         // Direct uom arithmetic: Length / Velocity = Time. No manual extraction.
         let vacuum_time: TimeOfFlight = distance / muzzle_velocity;
-        LagTime::new::<second>(
-            actual_time_of_flight.get::<second>() - vacuum_time.get::<second>(),
-        )
+        LagTime::new::<second>(actual_time_of_flight.get::<second>() - vacuum_time.get::<second>())
     }
 }
 
@@ -143,10 +141,7 @@ pub struct WindDeflectionCalc;
 impl WindDeflectionCalc {
     /// `crosswind_speed × lag_time`  →  inches (native uom: Velocity × Time = Length)
     #[builder(finish_fn = solve)]
-    pub fn calculate(
-        lag_time: LagTime,
-        crosswind_speed: WindSpeed,
-    ) -> WindDeflection {
+    pub fn calculate(lag_time: LagTime, crosswind_speed: WindSpeed) -> WindDeflection {
         // Direct uom arithmetic: WindSpeed × Time = Length. No magic constant.
         let length: Distance = crosswind_speed * lag_time;
         WindDeflection::new::<inch>(length.get::<inch>())

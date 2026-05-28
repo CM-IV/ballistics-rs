@@ -27,16 +27,16 @@
 #![forbid(unsafe_code)]
 #![allow(unexpected_cfgs)]
 
-pub mod units;
 pub mod constants;
 pub mod equations;
+pub mod units;
 
 /// One-stop import. Re-exports every public item from [`units`],
 /// [`constants`], and [`equations`].
 pub mod prelude {
-    pub use crate::units::*;
     pub use crate::constants::*;
     pub use crate::equations::*;
+    pub use crate::units::*;
 }
 
 // Crate-root glob re-export preserves `use ballistics_rs::*;` ergonomics
