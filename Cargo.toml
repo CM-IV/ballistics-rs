@@ -1,12 +1,13 @@
 [dependencies]
-synonym = "0.1.5"
 bon = "2.3.0"
+uom = { version = "0.36", default-features = false, features = ["f64", "si", "std", "autoconvert"] }
 
 [package]
 name = "ballistics_rs"
-version = "0.1.5"
+version = "0.2.0"
 authors = ["CM-IV"]
 edition = "2021"
+rust-version = "1.65"
 license = "MIT"
 repository = "https://github.com/CM-IV/ballistics-rs"
 description = "A Rust library for ballistics calculations"
