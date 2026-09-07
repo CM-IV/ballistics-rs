@@ -11,7 +11,7 @@ To use `ballistics_rs` in your project, add the following to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-ballistics_rs = "0.2.0"
+ballistics_rs = "0.3.0"
 ```
 
 ## Usage
@@ -203,16 +203,6 @@ println!("Standard temperature: {:.1} °F", standard_temperature().get::<degree_
 
 ## Unit Safety
 
-`ballistics_rs` 0.2 uses [`uom`](https://docs.rs/uom) for compile-time dimensional analysis. The compiler will reject code that mixes incompatible units — for example, passing a `Velocity` where a `Time` is expected will not compile.
-
-```rust
-use ballistics_rs::prelude::*;
-
-// This will NOT compile — Velocity cannot be used where LagTime is expected:
-// let _ = WindDeflectionCalc::calculate()
-//     .lag_time(Velocity::new::<foot_per_second>(10.0))
-//     .crosswind_speed(WindSpeed::new::<mile_per_hour>(5.0))
-//     .solve();
-```
+`ballistics_rs` 0.2 uses [`uom`](https://docs.rs/uom) for compile-time dimensional analysis.
 
 See [MIGRATION.md](MIGRATION.md) for details on migrating from 0.1.x.
