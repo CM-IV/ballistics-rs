@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2026-09-07
+
+### Fixed
+
+- **Breaking:** `GyroscopicStabilityCalc::calculate` now treats `rifling_twist`
+  as inches per turn (`RiflingTwist` alias moved from `Ratio` to `Length`) and
+  normalizes it to calibers per turn internally, per Miller's rule. 0.1.x used
+  raw inches-per-turn as calibers, overstating stability by `1/D²` (≈10.5× for
+  .308). README examples updated.
+- **Breaking:** `LagTimeExt::calculate` is now a no-arg forwarder like
+  `KineticEnergyExt`. The 0.2.0 signature accepted three quantities and
+  silently discarded them; callers must set `actual_time_of_flight`,
+  `distance`, and `muzzle_velocity` on the returned builder (same chain as
+  0.1.x).
+- Update dependency versions
+- Update Rust edition to 2024
+
 ## [0.2.0] - 2026-05-28
 
 ### Changed

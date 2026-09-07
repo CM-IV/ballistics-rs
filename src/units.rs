@@ -42,7 +42,7 @@ pub type SpinDrift = uom::si::f64::Length;
 pub type WindDeflection = uom::si::f64::Length;
 pub type SightCalibration = uom::si::f64::Length;
 pub type BulletLength = Ratio;
-pub type RiflingTwist = Ratio;
+pub type RiflingTwist = uom::si::f64::Length;
 pub type DragCoefficient = Ratio;
 pub type FormFactor = Ratio;
 pub type GyroscopicStability = Ratio;
@@ -55,16 +55,16 @@ pub type ApertureSightCalibration = Angle;
 // know which `uom::si::*` submodule a given unit lives in.
 // ---------------------------------------------------------------------------
 
-pub use uom::si::acceleration::foot_per_second_squared;
-pub use uom::si::energy::foot_pound;
-pub use uom::si::length::{foot, inch};
-pub use uom::si::mass::grain;
-pub use uom::si::mass_density::pound_per_cubic_foot;
-pub use uom::si::pressure::inch_of_mercury;
+pub use uom::si::acceleration::{foot_per_second_squared, meter_per_second_squared};
+pub use uom::si::energy::{foot_pound, joule};
+pub use uom::si::length::{foot, inch, meter};
+pub use uom::si::mass::{grain, milligram};
+pub use uom::si::mass_density::{kilogram_per_cubic_meter, pound_per_cubic_foot};
+pub use uom::si::pressure::{inch_of_mercury, pascal};
 pub use uom::si::ratio::ratio;
-pub use uom::si::thermodynamic_temperature::degree_fahrenheit;
+pub use uom::si::thermodynamic_temperature::{degree_celsius, degree_fahrenheit};
 pub use uom::si::time::second;
-pub use uom::si::velocity::{foot_per_second, mile_per_hour};
+pub use uom::si::velocity::{foot_per_second, kilometer_per_hour, meter_per_second, mile_per_hour};
 
 /// Minute of arc — the ballistics community's "MOA". Re-export of
 /// `uom::si::angle::minute` under a domain-friendlier name.

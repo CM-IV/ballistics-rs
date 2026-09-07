@@ -1,24 +1,15 @@
-[dependencies]
-bon = "2.3.0"
-uom = { version = "0.36", default-features = false, features = ["f64", "si", "std", "autoconvert"] }
-
 [package]
 name = "ballistics_rs"
-version = "0.2.0"
+version = "0.3.0"
 authors = ["CM-IV"]
-edition = "2021"
-rust-version = "1.65"
+edition = "2024"
 license = "MIT"
 repository = "https://github.com/CM-IV/ballistics-rs"
 description = "A Rust library for ballistics calculations"
 documentation = "https://docs.rs/ballistics_rs"
 homepage = "https://github.com/CM-IV/ballistics-rs"
 
-# optimize for size
-[profile.release]
-lto = "fat"
-opt-level = "s"
-debug = 0
-overflow-checks = false
-panic = "abort"
-codegen-units = 1
+[dependencies]
+bon = "3"
+uom = { version = "0.38", default-features = false, features = ["f64", "si", "std", "autoconvert"] }
+

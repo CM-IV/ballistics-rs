@@ -176,7 +176,12 @@ pub struct GyroscopicStabilityCalc;
 
 #[bon]
 impl GyroscopicStabilityCalc {
-    /// 9a. Miller base stability: `30·W / (T²·D³·L·(1+L²))`
+    /// 9a. Miller base stability: `30·W / (T_cal²·D³·L·(1+L²))`
+    ///
+    /// `T_cal` is the twist in **calibers per turn**, as Miller's rule
+    /// requires. `rifling_twist` is given in **inches per turn**
+    /// (1:10″ twist → `RiflingTwist::new::<inch>(10.0)`) and normalized
+    /// internally as `T_cal = twist / D`.
     #[builder(finish_fn = solve)]
     pub fn calculate(
         bullet_weight: BulletWeight,
@@ -185,10 +190,10 @@ impl GyroscopicStabilityCalc {
         bullet_length: BulletLength,
     ) -> GyroscopicStability {
         let w = bullet_weight.get::<grain>();
-        let t = rifling_twist.get::<ratio>();
         let d = bullet_diameter.get::<inch>();
         let l = bullet_length.get::<ratio>();
-        let s = (30.0 * w) / (t * t * d * d * d * l * (1.0 + l * l));
+        let t_cal = rifling_twist.get::<inch>() / d;
+        let s = (30.0 * w) / (t_cal * t_cal * d * d * d * l * (1.0 + l * l));
         GyroscopicStability::new::<ratio>(s)
     }
 
@@ -285,23 +290,14 @@ impl KineticEnergyExt for KineticEnergy {
     }
 }
 
-/// Old-style entry point for [`LagTimeCalc`].
-/// Only works because `LagTime` uniquely aliases `uom::Time` (TimeOfFlight
-/// has no `calculate` method, so no conflict).
+/// Old-style entry point for [`LagTimeCalc`] (0.1.x compat, like
+/// [`KineticEnergyExt`]). Only works because no other trait defines
+/// `calculate()` on the shared `uom::Time` base.
 pub trait LagTimeExt {
-    fn calculate(
-        actual_time_of_flight: TimeOfFlight,
-        distance: Distance,
-        muzzle_velocity: Velocity,
-    ) -> LagTimeCalcCalculateBuilder;
+    fn calculate() -> LagTimeCalcCalculateBuilder;
 }
 impl LagTimeExt for LagTime {
-    #[allow(unused_variables)]
-    fn calculate(
-        actual_time_of_flight: TimeOfFlight,
-        distance: Distance,
-        muzzle_velocity: Velocity,
-    ) -> LagTimeCalcCalculateBuilder {
+    fn calculate() -> LagTimeCalcCalculateBuilder {
         LagTimeCalc::calculate()
     }
 }

@@ -143,9 +143,9 @@ use ballistics_rs::prelude::*;
 
 let stability = GyroscopicStabilityCalc::calculate()
     .bullet_weight(BulletWeight::new::<grain>(150.0))
-    .rifling_twist(RiflingTwist::new::<ratio>(10.0))
+    .rifling_twist(RiflingTwist::new::<inch>(10.0)) // 1:10" twist
     .bullet_diameter(BulletDiameter::new::<inch>(0.308))
-    .bullet_length(BulletLength::new::<ratio>(4.0))
+    .bullet_length(BulletLength::new::<ratio>(4.0)) // calibers
     .solve();
 
 let velocity_corrected = GyroscopicStabilityCalc::velocity_correction()

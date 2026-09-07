@@ -42,18 +42,31 @@ intentional — the builder method names disambiguate them at call sites.
 | Underlying uom type | Domain aliases |
 |---|---|
 | `uom::si::f64::Velocity` | `Velocity`, `SpeedOfSound`, `WindSpeed`, `VelocityProjection` |
-| `uom::si::f64::Ratio` | `DragCoefficient`, `FormFactor`, `GyroscopicStability`, `BallisticCoefficient`, `BulletLength`, `RiflingTwist` |
+| `uom::si::f64::Ratio` | `DragCoefficient`, `FormFactor`, `GyroscopicStability`, `BallisticCoefficient`, `BulletLength` |
 | `uom::si::f64::Angle` | `AerodynamicJump`, `ApertureSightCalibration` |
-| `uom::si::f64::Length` | `Distance`, `BulletDiameter`, `SpinDrift`, `WindDeflection`, `SightCalibration` |
+| `uom::si::f64::Length` | `Distance`, `BulletDiameter`, `SpinDrift`, `WindDeflection`, `SightCalibration`, `RiflingTwist` |
 | `uom::si::f64::Time` | `TimeOfFlight`, `LagTime` |
 
 For types that share an underlying uom quantity, use the calculation's marker
 struct directly (e.g. `SpeedOfSoundCalc::calculate()` instead of
-`SpeedOfSound::calculate()`). Only `KineticEnergy` has a unique extension
-trait (`KineticEnergy::calculate()`) because it uniquely aliases `uom::Energy`.
+`SpeedOfSound::calculate()`). Only `KineticEnergy` and `LagTime` have
+extension traits (`KineticEnergy::calculate()`, `LagTime::calculate()`):
+`KineticEnergy` uniquely aliases `uom::Energy`, and nothing else defines
+`calculate()` on the `uom::Time` base that `LagTime` aliases.
 
 ## Deprecated constants
 
 The old `STANDARD_GRAVITY`, `SPEED_OF_SOUND_SEA_LEVEL`, `AIR_DENSITY_SEA_LEVEL`,
 `STANDARD_PRESSURE`, and `STANDARD_TEMPERATURE` constants are still available
 as functions with a deprecation warning. They will be removed in 0.3.
+
+## 0.2.1: twist-unit fix
+
+`GyroscopicStabilityCalc::calculate` now expects `rifling_twist` in **inches
+per turn** (the `RiflingTwist` alias moved from `Ratio` to `Length`) and
+normalizes it to calibers per turn internally, as Miller's rule requires.
+0.1.x/0.2.0 used raw inches-per-turn as calibers, overstating stability by
+`1/D²` (≈10.5× for .308). Update call sites from
+`RiflingTwist::new::<ratio>(10.0)` to `RiflingTwist::new::<inch>(10.0)`. Restores
+the 0.1.x no-arg `LagTime::calculate()` entry point (0.2.0 briefly shipped a
+variant that accepted positional arguments and discarded them).

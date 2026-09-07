@@ -5,6 +5,12 @@
 //! the v0.2.0 typed implementation. They must agree to 1e-9 relative
 //! error — confirming the migration is a pure refactor at the
 //! arithmetic level.
+//!
+//! Exception: the gyroscopic-stability base test deviates from the 0.1.x
+//! formula on purpose. 0.1.x passed raw twist-in-inches where Miller's rule
+//! expects calibers-per-turn (a ~1/D² error); the fix normalizes twist
+//! internally, so that test's expected value is recomputed with the
+//! corrected formula, and a pinned reference-value test guards the result.
 
 use ballistics_rs::prelude::*;
 
@@ -115,17 +121,35 @@ fn aerodynamic_jump_matches_legacy() {
 }
 
 #[test]
-fn gyroscopic_stability_base_matches_legacy() {
-    let (w, t, d, l) = (150.0_f64, 10.0_f64, 0.308_f64, 4.0_f64);
-    let expected = (30.0 * w) / (t * t * d * d * d * l * (1.0 + l * l));
+fn gyroscopic_stability_base_matches_miller_rule() {
+    // Intentionally NOT legacy-equal: 0.1.x used raw inches-per-turn as
+    // calibers-per-turn. Twist is now inches per turn and is normalized
+    // to calibers per turn internally (Miller's rule).
+    let (w, t_in, d, l) = (150.0_f64, 10.0_f64, 0.308_f64, 4.0_f64);
+    let t_cal = t_in / d;
+    let expected = (30.0 * w) / (t_cal * t_cal * d * d * d * l * (1.0 + l * l));
     let actual = GyroscopicStabilityCalc::calculate()
         .bullet_weight(BulletWeight::new::<grain>(w))
-        .rifling_twist(RiflingTwist::new::<ratio>(t))
+        .rifling_twist(RiflingTwist::new::<inch>(t_in))
         .bullet_diameter(BulletDiameter::new::<inch>(d))
         .bullet_length(BulletLength::new::<ratio>(l))
         .solve()
         .get::<ratio>();
     approx_eq(actual, expected, 1e-9);
+}
+
+#[test]
+fn gyroscopic_stability_reference_value() {
+    // Independently pinned Miller result for the README example
+    // (150 gr, 1:10" twist, .308" diameter, 4 calibers long): Sg ≈ 2.1486.
+    let actual = GyroscopicStabilityCalc::calculate()
+        .bullet_weight(BulletWeight::new::<grain>(150.0))
+        .rifling_twist(RiflingTwist::new::<inch>(10.0))
+        .bullet_diameter(BulletDiameter::new::<inch>(0.308))
+        .bullet_length(BulletLength::new::<ratio>(4.0))
+        .solve()
+        .get::<ratio>();
+    approx_eq(actual, 2.1486, 1e-3);
 }
 
 #[test]
